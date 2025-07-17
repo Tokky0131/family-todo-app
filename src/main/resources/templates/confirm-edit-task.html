@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>タスク編集確認</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+  <h1>更新しますか？</h1>
+  <p>ID: <span th:text="${task.id}"></span></p>
+  <p>タイトル: <span th:text="${task.title}"></span></p>
+  <p>詳細: <span th:text="${task.description}"></span></p>
+  <p>状態: <span th:text="${task.status}"></span></p>
+
+  <form th:action="@{/tasks/edit/complete}" th:object="${task}" method="post">
+    <input type="hidden" th:field="*{id}" />
+    <input type="hidden" th:field="*{title}" />
+    <input type="hidden" th:field="*{description}" />
+    <input type="hidden" th:field="*{status}" />
+    <button type="submit" class="button">確定</button>
+  </form>
+</body>
+</html>

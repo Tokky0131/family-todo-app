@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>タスク登録確認</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <h1>タスク登録確認</h1>
+
+    <p>タイトル: <span th:text="${task.title}"></span></p>
+    <p>詳細:   <span th:text="${task.description}"></span></p>
+    <p>期限:   <span th:text="${#temporals.format(task.deadline,'yyyy-MM-dd')}"></span></p>
+    <p>進捗:   <span th:text="${task.status}"></span></p>
+
+    <form th:action="@{/tasks/complete}" method="post" th:object="${task}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <!-- 忘れず deadline も hidden で送信 -->
+        <input type="hidden" th:field="*{title}" />
+        <input type="hidden" th:field="*{description}" />
+        <input type="hidden" th:field="*{deadline}" />
+        <input type="hidden" th:field="*{status}" />
+        <button type="submit" class="button">登録確定</button>
+    </form>
+
+    <form th:action="@{/tasks/create}" method="get" style="display:inline;">
+        <button type="submit" class="button">修正する</button>
+    </form>
+    <a th:href="@{/tasks}">一覧に戻る</a>
+</body>
+</html>
