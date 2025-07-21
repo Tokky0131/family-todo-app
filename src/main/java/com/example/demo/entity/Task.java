@@ -17,18 +17,18 @@ import lombok.Data;
 @Table(name = "task")
 public class Task {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @NotBlank(message = "タイトルは必須です。")
-    private String title;
+	@NotBlank(message = "タイトルは必須です。")
+	private String title;
 
-    private String description;
+	private String description;
 
-    private String status;
+	private String status;
 
-    // ===== Added deadline =====
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate deadline;
+	// ===== Added deadline =====
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate deadline;
 }

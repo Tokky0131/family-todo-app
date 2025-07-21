@@ -9,7 +9,8 @@ import com.example.demo.entity.Task;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    boolean existsByTitleAndDescription(String title, String description);
-    // 新規: 期限昇順で取得
-    List<Task> findAllByOrderByDeadlineAsc();
+	boolean existsByTitleAndDescription(String title, String description);
+
+	// 新規: 期限昇順で取得
+	List<Task> findAllByOrderByDeadlineAsc();
 }

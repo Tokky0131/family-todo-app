@@ -1,70 +1,72 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-  <title>タスク一覧</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
+	<title>タスク一覧</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
+
 <body>
-  <header>
-    <div class="header-logo">TODO LIST</div>
-  </header>
+	<header>
+		<div class="header-logo">TODO LIST</div>
+	</header>
 
-  <div th:if="${successMessage}" class="flash-success">
-    <p th:text="${successMessage}"></p>
-  </div>
+	<div th:if="${successMessage}" class="flash-success">
+		<p th:text="${successMessage}"></p>
+	</div>
 
-  <form th:action="@{/logout}" method="post">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-    <button type="submit">ログアウト</button>
-  </form>
+	<form th:action="@{/logout}" method="post">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+		<button type="submit">ログアウト</button>
+	</form>
 
-  <div style="position: relative; width: 100%; max-width: 1200px; margin: 0 auto;">
-    <small style="position: absolute; top: -25px; right: 0; font-size: 0.8em; color: #666;">
-      ☓:未着手 &nbsp; △:着手中 &nbsp; 〇:完了
-    </small>
+	<div style="position: relative; width: 100%; max-width: 1200px; margin: 0 auto;">
+		<small style="position: absolute; top: -25px; right: 0; font-size: 0.8em; color: #666;">
+			☓:未着手 &nbsp; △:着手中 &nbsp; 〇:完了
+		</small>
 
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>タイトル</th>
-            <th>詳細</th>
-            <th>進捗</th>
-            <th>期限</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            th:each="task : ${tasks}"
-            th:classappend="${task.deadline == T(java.time.LocalDate).now()} ? ' today-deadline' : ''">
-            <td th:text="${task.id}">1</td>
-            <td th:text="${task.title}">タイトル</td>
-            <td th:text="${task.description}">詳細</td>
-            <td>
-              <form th:action="@{'/tasks/updateStatus/' + ${task.id}}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <select name="status">
-                  <option value="未着手" th:selected="${task.status == '未着手'}">☓</option>
-                  <option value="着手中" th:selected="${task.status == '着手中'}">△</option>
-                  <option value="完了" th:selected="${task.status == '完了'}">〇</option>
-                </select>
-                <button type="submit" class="button-small">更新</button>
-              </form>
-            </td>
-            <td th:text="${#temporals.format(task.deadline,'yyyy-MM-dd')}">2025-07-17</td>
-            <td>
-              <a th:href="@{'/tasks/edit/' + ${task.id}}">編集</a>
-              <a th:href="@{'/tasks/delete/confirm/' + ${task.id}}">削除</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+		<div class="table-wrapper">
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>タイトル</th>
+						<th>詳細</th>
+						<th>進捗</th>
+						<th>期限</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="task : ${tasks}"
+						th:classappend="${task.deadline == T(java.time.LocalDate).now()} ? ' today-deadline' : ''">
+						<td th:text="${task.id}">1</td>
+						<td th:text="${task.title}">タイトル</td>
+						<td th:text="${task.description}">詳細</td>
+						<td>
+							<form th:action="@{'/tasks/updateStatus/' + ${task.id}}" method="post">
+								<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+								<select name="status">
+									<option value="未着手" th:selected="${task.status == '未着手'}">☓</option>
+									<option value="着手中" th:selected="${task.status == '着手中'}">△</option>
+									<option value="完了" th:selected="${task.status == '完了'}">〇</option>
+								</select>
+								<button type="submit" class="button-small">更新</button>
+							</form>
+						</td>
+						<td th:text="${#temporals.format(task.deadline,'yyyy-MM-dd')}">2025-07-17</td>
+						<td>
+							<a th:href="@{'/tasks/edit/' + ${task.id}}">編集</a>
+							<a th:href="@{'/tasks/delete/confirm/' + ${task.id}}">削除</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
-    <br>
-    <a th:href="@{/tasks/create}"><button class="button">新規タスク作成</button></a>
-  </div>
+		<br>
+		<a th:href="@{/tasks/create}"><button class="button">新規タスク作成</button></a>
+	</div>
 </body>
+
 </html>
