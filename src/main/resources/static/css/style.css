@@ -7,6 +7,8 @@ body {
 	padding: 0;
 	/* 全体背景グラデーション */
 	background: linear-gradient(to bottom, #fffefc, #e8f0ff);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
 }
 
 /* 全体フォント */
@@ -15,6 +17,7 @@ body {
 	text-align: center;
 	color: #333;
 	line-height: 1.6;
+	
 }
 
 /* テーブル設定 */

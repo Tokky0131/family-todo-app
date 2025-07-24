@@ -4,6 +4,20 @@
 <head>
 	<title>タスク一覧</title>
 	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<style>
+		/* ▼ Flexboxでボタン配置を制御 */
+		.button-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			max-width: 1200px;
+			margin: 1rem auto;
+		}
+
+		.center-button {
+			margin: 0 auto;
+		}
+	</style>
 </head>
 
 <body>
@@ -15,10 +29,19 @@
 		<p th:text="${successMessage}"></p>
 	</div>
 
-	<form th:action="@{/logout}" method="post">
-		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-		<button type="submit">ログアウト</button>
-	</form>
+	<!-- ▼ ボタン横並び配置 -->
+	<div class="button-row">
+		<!-- 中央に配置される新規作成ボタン -->
+		<a th:href="@{/tasks/create}" class="center-button">
+			<button class="button">新規タスク作成</button>
+		</a>
+
+		<!-- 右に配置されるログアウトボタン -->
+		<form th:action="@{/logout}" method="post">
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			<button type="submit">ログアウト</button>
+		</form>
+	</div>
 
 	<div style="position: relative; width: 100%; max-width: 1200px; margin: 0 auto;">
 		<small style="position: absolute; top: -25px; right: 0; font-size: 0.8em; color: #666;">
@@ -63,9 +86,6 @@
 				</tbody>
 			</table>
 		</div>
-
-		<br>
-		<a th:href="@{/tasks/create}"><button class="button">新規タスク作成</button></a>
 	</div>
 </body>
 
