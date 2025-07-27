@@ -22,7 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**").permitAll()
+                .requestMatchers("/login", "/css/**", "/images/**").permitAll()  // ✅ ← ここ追加！
                 .requestMatchers("/tasks/create").permitAll()
                 .anyRequest().authenticated()
             )
@@ -41,7 +41,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ 実運用では必ず BCryptPasswordEncoder などのハッシュ化を使うこと！
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
