@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>登録内容確認</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <header>
+        <div class="header-logo">
+            <img th:src="@{/images/my_todo_logo_final.png}" alt="MY TODO LOGO" style="height: 60px;">
+        </div>
+    </header>
+
+    <h2>登録内容確認</h2>
+
+    <!-- 入力内容の表示 -->
+    <p>ユーザー名: <span th:text="${user.username}"></span></p>
+    <p>パスワード: ********</p> <!-- パスワードは伏せ字表示 -->
+
+    <form th:action="@{/register/confirm}" method="post">
+        <!-- ユーザー名とパスワードを隠しフィールドで再送信 -->
+        <input type="hidden" name="username" th:value="${user.username}">
+        <input type="hidden" name="password" th:value="${user.password}">
+
+        <button type="submit">登録確定</button>
+    </form>
+
+    <form th:action="@{/register}" method="get" style="display:inline;">
+        <button type="submit">修正する</button>
+    </form>
+
+</body>
+</html>
