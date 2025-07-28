@@ -8,10 +8,10 @@
 <body>
 
     <header>
-    <div class="header-logo">
-  <img src="/images/my_todo_logo_final.png" alt="MY TODO LOGO" style="height: 60px;">
-  </div>
-  </header>
+        <div class="header-logo">
+            <img src="/images/my_todo_logo_final.png" alt="MY TODO LOGO" style="height: 60px;">
+        </div>
+    </header>
 
     <!-- エラーメッセージ -->
     <div th:if="${param.error}">
@@ -35,5 +35,15 @@
         </div>
         <button type="submit">ログイン</button>
     </form>
+
+    <!-- ✅ アカウント登録ボタン -->
+    <div style="margin-top: 20px;">
+        <p>↓アカウント登録はこちら↓</p>
+        <form th:action="@{/users/register}" method="get">
+            <button type="submit">アカウント登録</button>
+        </form>
+    </div>
+
 </body>
 </html>
+
