@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.User;
@@ -23,19 +24,31 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    	 
-    	
-    	User user = userRepository
+        User user = userRepository
             .findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-    	  
-    	
-    	
         return new org.springframework.security.core.userdetails.User(
             user.getUsername(),
             user.getPassword(),
-            Collections.emptyList()  // 必要に応じて権限を設定
+            Collections.emptyList()
         );
+    }
+
+    // ✅ ユーザー名の重複チェック
+    public boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
+    // ✅ ユーザー登録（パスワード暗号化付き）
+    public void registerUser(String username, String rawPassword) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(rawPassword);
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(encodedPassword);
+
+        userRepository.save(user);
     }
 }

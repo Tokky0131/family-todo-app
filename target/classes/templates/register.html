@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>アカウント登録</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <header>
+        <div class="header-logo">
+            <img th:src="@{/images/my_todo_logo_final.png}" alt="MY TODO LOGO" style="height: 60px;">
+        </div>
+    </header>
+
+    <h2>アカウント登録</h2>
+
+    <!-- エラーメッセージ表示（例：バリデーション失敗時など） -->
+    <div th:if="${errorMessage}">
+        <p style="color: red;" th:text="${errorMessage}"></p>
+    </div>
+
+    <!-- 登録フォーム -->
+    <form th:action="@{/register}" method="post">
+        <div>
+            <label for="username">ユーザー名：</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">パスワード：</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <button type="submit">登録する</button>
+        </div>
+    </form>
+
+    <!-- ログイン画面に戻るリンク -->
+    <p><a th:href="@{/login}">ログイン画面に戻る</a></p>
+
+</body>
+</html>
