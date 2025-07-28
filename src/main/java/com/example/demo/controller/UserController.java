@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.demo.form.UserForm;
 import com.example.demo.service.CustomUserDetailsService;
 
 @Controller
@@ -21,13 +23,13 @@ public class UserController {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    // アカウント登録画面表示
+    // --- 即登録用の既存フロー（残す） ---
     @GetMapping("/register")
-    public String showRegistrationForm() {
-        return "register-user";  // register-user.html に遷移
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("userForm", new UserForm());
+        return "register-user";  // 入力フォーム表示
     }
 
-    // アカウント登録処理
     @PostMapping("/register")
     public String registerUser(
         @RequestParam String username,
@@ -40,6 +42,38 @@ public class UserController {
         }
 
         customUserDetailsService.registerUser(username, password);
+        return "redirect:/login";
+    }
+
+    // --- 確認画面付きの新フロー ---
+
+    // 入力内容確認画面へ
+    @PostMapping("/register/confirm")
+    public String confirmRegistration(@ModelAttribute UserForm userForm, Model model) {
+        // ユーザー名重複チェック（確認画面に入る前に防ぐ）
+        if (customUserDetailsService.existsByUsername(userForm.getUsername())) {
+            model.addAttribute("error", "そのユーザー名はすでに使われています");
+            return "register-user";
+        }
+
+        model.addAttribute("user", userForm);  // confirm-user.html用
+        return "confirm-user";
+    }
+
+    // 登録確定 → DB登録処理
+    @PostMapping("/register/complete")
+    public String completeRegistration(@ModelAttribute UserForm userForm, Model model) {
+        boolean success = customUserDetailsService.registerUser(
+            userForm.getUsername(),
+            userForm.getPassword()
+        );
+
+        if (!success) {
+            model.addAttribute("error", "登録に失敗しました。もう一度お試しください。");
+            model.addAttribute("user", userForm);
+            return "confirm-user";
+        }
+
         return "redirect:/login";
     }
 }

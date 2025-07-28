@@ -40,15 +40,22 @@ public class CustomUserDetailsService implements UserDetailsService {
         return userRepository.findByUsername(username).isPresent();
     }
 
-    // ✅ ユーザー登録（パスワード暗号化付き）
-    public void registerUser(String username, String rawPassword) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encodedPassword = encoder.encode(rawPassword);
+    // ✅ ユーザー登録（パスワード暗号化付き） → boolean型に変更！
+    public boolean registerUser(String username, String rawPassword) {
+        try {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String encodedPassword = encoder.encode(rawPassword);
 
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(encodedPassword);
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(encodedPassword);
 
-        userRepository.save(user);
+            userRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            // ログを出すならここ（省略可）
+            e.printStackTrace();
+            return false;
+        }
     }
 }
