@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>アカウント登録確認</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <h1>アカウント登録確認</h1>
+
+    <form th:action="@{/users/register-user/complete}" method="post">
+        <input type="hidden" th:name="username" th:value="${userForm.username}" />
+        <input type="hidden" th:name="password" th:value="${userForm.password}" />
+
+        <p>ユーザー名：<span th:text="${userForm.username}"></span></p>
+        <p>パスワード：<span>●●●●●</span></p> <!-- 表示しない・マスキング -->
+
+        <button type="submit">登録</button>
+    </form>
+
+    <form th:action="@{/users/register}" method="get">
+        <button type="submit">戻る</button>
+    </form>
+</body>
+</html>

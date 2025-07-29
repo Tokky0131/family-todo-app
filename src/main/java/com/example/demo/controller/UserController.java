@@ -45,23 +45,22 @@ public class UserController {
         return "redirect:/login";
     }
 
-    // --- 確認画面付きの新フロー ---
+    // --- 確認画面付きの新フロー（改訂版） ---
 
     // 入力内容確認画面へ
     @PostMapping("/register/confirm")
     public String confirmRegistration(@ModelAttribute UserForm userForm, Model model) {
-        // ユーザー名重複チェック（確認画面に入る前に防ぐ）
         if (customUserDetailsService.existsByUsername(userForm.getUsername())) {
             model.addAttribute("error", "そのユーザー名はすでに使われています");
             return "register-user";
         }
 
-        model.addAttribute("user", userForm);  // confirm-user.html用
-        return "confirm-user";
+        model.addAttribute("userForm", userForm);  // HTMLで ${userForm.username}
+        return "register-user-confirm";            // 確認画面のHTML名と一致させる
     }
 
     // 登録確定 → DB登録処理
-    @PostMapping("/register/complete")
+    @PostMapping("/register-user/complete")
     public String completeRegistration(@ModelAttribute UserForm userForm, Model model) {
         boolean success = customUserDetailsService.registerUser(
             userForm.getUsername(),
@@ -70,8 +69,8 @@ public class UserController {
 
         if (!success) {
             model.addAttribute("error", "登録に失敗しました。もう一度お試しください。");
-            model.addAttribute("user", userForm);
-            return "confirm-user";
+            model.addAttribute("userForm", userForm);
+            return "register-user-confirm";
         }
 
         return "redirect:/login";

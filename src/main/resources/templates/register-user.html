@@ -8,7 +8,7 @@
 <body>
     <h1>アカウント登録</h1>
 
-    <form th:action="@{/users/confirm}" method="post" th:object="${userForm}">
+    <form th:action="@{/users/register/confirm}" method="post" th:object="${userForm}">
         <div>
             <label for="username">ユーザー名：</label>
             <input type="text" id="username" th:field="*{username}">
