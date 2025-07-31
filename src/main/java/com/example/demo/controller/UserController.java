@@ -27,7 +27,7 @@ public class UserController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("userForm", new UserForm());
-        return "register-user";  // 入力フォーム表示
+        return "register-user";
     }
 
     @PostMapping("/register")
@@ -42,12 +42,11 @@ public class UserController {
         }
 
         customUserDetailsService.registerUser(username, password);
-        return "redirect:/login";
+        return "redirect:/login-page?registered"; // ✅ 登録完了メッセージを1回だけ表示
     }
 
     // --- 確認画面付きの新フロー（改訂版） ---
 
-    // 入力内容確認画面へ
     @PostMapping("/register/confirm")
     public String confirmRegistration(@ModelAttribute UserForm userForm, Model model) {
         if (customUserDetailsService.existsByUsername(userForm.getUsername())) {
@@ -55,11 +54,10 @@ public class UserController {
             return "register-user";
         }
 
-        model.addAttribute("userForm", userForm);  // HTMLで ${userForm.username}
-        return "register-user-confirm";            // 確認画面のHTML名と一致させる
+        model.addAttribute("userForm", userForm);
+        return "register-user-confirm";
     }
 
-    // 登録確定 → DB登録処理
     @PostMapping("/register-user/complete")
     public String completeRegistration(@ModelAttribute UserForm userForm, Model model) {
         boolean success = customUserDetailsService.registerUser(
@@ -73,6 +71,6 @@ public class UserController {
             return "register-user-confirm";
         }
 
-        return "redirect:/login";
+        return "redirect:/login?registered";  // ✅ 成功時、登録完了メッセージ付きでログイン画面へ
     }
 }

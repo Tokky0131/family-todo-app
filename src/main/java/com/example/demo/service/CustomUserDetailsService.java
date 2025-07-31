@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.User;
@@ -16,10 +16,12 @@ import com.example.demo.repository.UserRepository;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder; // 🔧 追加：DIで注入
 
     @Autowired
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder; // 🔧 追加：コンストラクタで受け取る
     }
 
     @Override
@@ -40,11 +42,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         return userRepository.findByUsername(username).isPresent();
     }
 
-    // ✅ ユーザー登録（パスワード暗号化付き） → boolean型に変更！
+    // ✅ ユーザー登録（パスワード暗号化付き）
     public boolean registerUser(String username, String rawPassword) {
         try {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            String encodedPassword = encoder.encode(rawPassword);
+            String encodedPassword = passwordEncoder.encode(rawPassword); // 🔧 修正：DIで使う
 
             User user = new User();
             user.setUsername(username);
@@ -53,8 +54,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             userRepository.save(user);
             return true;
         } catch (Exception e) {
-            // ログを出すならここ（省略可）
-            e.printStackTrace();
+            e.printStackTrace(); // 任意でログ出力
             return false;
         }
     }
