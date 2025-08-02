@@ -40,6 +40,7 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login-page")  // ← 🔁 login.htmlへのGETは /login-page に変更
                 .loginProcessingUrl("/login") // ← POSTは /login に飛ばす
+                .failureUrl("/login-page?error") 
                 .permitAll()
             )
             .logout(logout -> logout
