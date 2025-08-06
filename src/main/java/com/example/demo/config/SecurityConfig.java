@@ -38,9 +38,10 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login-page")  // ← 🔁 login.htmlへのGETは /login-page に変更
+                .loginPage("/login")  // ← 🔁 login.htmlへのGETは /login-page に変更
                 .loginProcessingUrl("/login") // ← POSTは /login に飛ばす
-                .failureUrl("/login-page?error") 
+                .defaultSuccessUrl("/tasks", true) // ← 成功後は /tasks にリダイレクト
+                .failureUrl("/login?error") 
                 .permitAll()
             )
             .logout(logout -> logout
