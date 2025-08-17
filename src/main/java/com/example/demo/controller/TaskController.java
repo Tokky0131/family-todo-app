@@ -122,7 +122,7 @@ public String confirm(
         return "edit-task";
     }
 
-    // TaskController.java の編集確認メソッド
+    // 編集確認メソッド
 
 @PostMapping("/tasks/edit/confirm")
 public String editConfirm(
