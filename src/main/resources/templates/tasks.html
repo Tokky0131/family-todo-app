@@ -7,8 +7,8 @@
 <body>
   <header>
     <div class="header-logo">
-    <img th:src="@{/images/my_todo_logo_final.png}" alt="MY TODO LOGO" style="height: 60px;">
-  </div>
+      <img th:src="@{/images/my_todo_logo_final.png}" alt="MY TODO LOGO" style="height: 60px;">
+    </div>
   </header>
 
   <div th:if="${successMessage}" class="flash-success">
@@ -41,7 +41,15 @@
       ☓:未着手 &nbsp; △:着手中 &nbsp; 〇:完了
     </small>
 
-    <div class="table-wrapper">
+    <!-- 0件時メッセージ（EM01）：空描画しない -->
+    <div th:if="${#lists.isEmpty(tasks)}"
+         class="empty-message"
+         style="margin: 24px 20px; padding: 16px; border: 1px dashed #bbb; background: #fafafa; text-align: center;">
+      登録されているタスクはありません
+    </div>
+
+    <!-- 一覧テーブル：1件以上のときだけ描画 -->
+    <div class="table-wrapper" th:if="${!#lists.isEmpty(tasks)}">
       <table>
         <thead>
           <tr>

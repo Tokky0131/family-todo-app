@@ -45,8 +45,11 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutSuccessUrl("/login-page?logout")
-                .permitAll()
+            	    .logoutUrl("/logout")               // ← POST /logout を受ける
+            	    .logoutSuccessUrl("/login?logout")  // ← ログアウト後は /login?logout
+            	    .invalidateHttpSession(true)        // ← セッション無効化
+            	    .deleteCookies("JSESSIONID")        // ← Cookieも削除
+            	    .permitAll()
             );
 
         return http.build();
