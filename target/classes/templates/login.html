@@ -9,46 +9,53 @@
 
     <header>
         <div class="header-logo">
-            <img src="/images/my_todo_logo_final.png" alt="MY TODO LOGO" style="height: 60px;">
+            <!-- th:src にしてコンテキストパス配慮 -->
+            <img th:src="@{/images/my_todo_logo_final.png}" alt="MY TODO LOGO" style="height: 60px;">
         </div>
     </header>
 
-    <!-- エラーメッセージ -->
-    <div th:if="${param.error}">
-        <p style="color: red;">ユーザー名またはパスワードが正しくありません</p>
+    <!-- フラッシュ/パラメータメッセージ -->
+    <div style="margin: 0 20px;">
+        <!-- エラー -->
+        <div th:if="${param.error}" class="flash-error" role="alert" aria-live="polite">
+            ユーザー名またはパスワードが正しくありません
+        </div>
+        <!-- ログアウト -->
+        <div th:if="${param.logout}" class="flash-success" role="status" aria-live="polite">
+            ログアウトしました。
+        </div>
+        <!-- 登録完了 -->
+        <div th:if="${param.registered}" class="flash-success" role="status" aria-live="polite">
+            アカウント登録が完了しました。ログインしてください。
+        </div>
     </div>
 
-    <!-- ログアウトメッセージ -->
-    <div th:if="${param.logout}">
-        <p style="color: green;">ログアウトしました</p>
-    </div>
-    
-    <!-- 登録完了メッセージ -->
-  <div th:if="${param.registered}" style="color: green;">
-        アカウント登録が完了しました。
-    </div>
-    
     <!-- ログインフォーム -->
-    <form th:action="@{/login}" method="post">
+    <form th:action="@{/login}" method="post" style="margin: 20px;">
+        <!-- CSRF トークン（必須） -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
         <div>
             <label for="username">ユーザー名:</label>
-            <input type="text" name="username" id="username" />
+            <input type="text" name="username" id="username" required
+                   autocomplete="username" autofocus>
         </div>
-        <div>
+        <div style="margin-top: 8px;">
             <label for="password">パスワード:</label>
-            <input type="password" name="password" id="password" />
+            <input type="password" name="password" id="password" required
+                   autocomplete="current-password">
         </div>
-        <button type="submit">ログイン</button>
+
+        <button type="submit" class="button" style="margin-top: 12px;">ログイン</button>
     </form>
 
-    <!-- ✅ アカウント登録ボタン -->
-    <div style="margin-top: 20px;">
+    <!-- アカウント登録 -->
+    <div style="margin: 0 20px 20px;">
         <p>↓アカウント登録はこちら↓</p>
         <form th:action="@{/users/register}" method="get">
-            <button type="submit">アカウント登録</button>
+            <button type="submit" class="button">アカウント登録</button>
         </form>
     </div>
 
 </body>
 </html>
-

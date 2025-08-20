@@ -11,26 +11,25 @@
     </div>
   </header>
 
-  <div th:if="${successMessage}" class="flash-success">
+  <!-- フラッシュメッセージ -->
+  <div th:if="${successMessage}" class="flash-success" style="margin: 0 20px;">
     <p th:text="${successMessage}"></p>
   </div>
+  <div th:if="${errorMessage}" class="flash-error" style="margin: 0 20px;">
+    <p th:text="${errorMessage}"></p>
+  </div>
 
-  <!-- 新規タスク作成＆ログアウトを横並びで配置 -->
+  <!-- 新規タスク作成＆ログアウト -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin: 0 20px 40px;">
-    <!-- 左スペース -->
     <div style="flex: 1;"></div>
-
-    <!-- 中央：新規タスク作成 -->
     <div style="flex: 1; text-align: center;">
       <a th:href="@{/tasks/create}">
         <button class="button">新規タスク作成</button>
       </a>
     </div>
-
-    <!-- 右：ログアウト -->
     <div style="flex: 1; text-align: right;">
       <form th:action="@{/logout}" method="post" style="display: inline;">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <button type="submit" class="button" style="background-color: #f44336;">ログアウト</button>
       </form>
     </div>
@@ -41,14 +40,14 @@
       ☓:未着手 &nbsp; △:着手中 &nbsp; 〇:完了
     </small>
 
-    <!-- 0件時メッセージ（EM01）：空描画しない -->
+    <!-- 0件時メッセージ（空描画しない） -->
     <div th:if="${#lists.isEmpty(tasks)}"
          class="empty-message"
          style="margin: 24px 20px; padding: 16px; border: 1px dashed #bbb; background: #fafafa; text-align: center;">
       登録されているタスクはありません
     </div>
 
-    <!-- 一覧テーブル：1件以上のときだけ描画 -->
+    <!-- 一覧テーブル：1件以上のみ -->
     <div class="table-wrapper" th:if="${!#lists.isEmpty(tasks)}">
       <table>
         <thead>
@@ -62,23 +61,25 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            th:each="task : ${tasks}"
-            th:classappend="${task.deadline == T(java.time.LocalDate).now()} ? ' today-deadline' : ''">
+          <tr th:each="task : ${tasks}"
+              th:classappend="${task.deadline == T(java.time.LocalDate).now()} ? ' today-deadline' : ''">
             <td th:text="${task.id}">1</td>
             <td th:text="${task.title}">タイトル</td>
             <td th:text="${task.description}">詳細</td>
+
+            <!-- 進捗：即時更新（確認画面なし） -->
             <td>
-              <form th:action="@{'/tasks/updateStatus/' + ${task.id}}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <form th:action="@{'/tasks/' + ${task.id} + '/progress'}" method="post" style="display:inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <select name="status">
                   <option value="未着手" th:selected="${task.status == '未着手'}">☓</option>
                   <option value="着手中" th:selected="${task.status == '着手中'}">△</option>
-                  <option value="完了" th:selected="${task.status == '完了'}">〇</option>
+                  <option value="完了"   th:selected="${task.status == '完了'}">〇</option>
                 </select>
                 <button type="submit" class="button-small">更新</button>
               </form>
             </td>
+
             <td th:text="${#temporals.format(task.deadline,'yyyy-MM-dd')}">2025-07-17</td>
             <td>
               <a th:href="@{'/tasks/edit/' + ${task.id}}">編集</a>
