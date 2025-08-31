@@ -46,23 +46,15 @@ public class TaskController {
         BindingResult bindingResult,
         Model model
     ) {
-        // 重複
+        // ===== 入力検証は @Valid（Task のアノテーション）に任せる =====
+        // タイトル未入力や長さチェックの手動追加は削除
+
+        // --- 重複（業務ルール） ---
         if (taskService.existsByTitleAndDescription(task.getTitle(), task.getDescription())) {
             bindingResult.rejectValue("title", "duplicate", "タイトルと詳細が同じタスクが既に存在します。");
         }
-        // タイトル
-        if (task.getTitle() == null || task.getTitle().isBlank()) {
-            bindingResult.rejectValue("title", "blank", "タイトルは必須です。");
-        } else if (task.getTitle().length() > 10) {
-            bindingResult.rejectValue("title", "length", "タイトルは10文字以内で入力してください。");
-        }
-        // 詳細
-        if (task.getDescription() != null && !task.getDescription().isBlank()) {
-            if (task.getDescription().length() > 20) {
-                bindingResult.rejectValue("description", "length", "詳細は20文字以内で入力してください。");
-            }
-        }
-        // 禁止ワード
+
+        // --- 禁止ワード（業務ルール） ---
         List<String> forbiddenWords = List.of(
             "願う", "想う", "考える", "祈る",
             "優勝", "合格", "達成", "成功", "勝つ",
@@ -74,7 +66,8 @@ public class TaskController {
                 break;
             }
         }
-        // デフォルト進捗
+
+        // --- デフォルト進捗 ---
         if (task.getStatus() == null || task.getStatus().isBlank()) {
             task.setStatus("未着手");
         }
@@ -111,7 +104,9 @@ public class TaskController {
         BindingResult bindingResult,
         Model model
     ) {
-        // NGワード
+        // ===== 入力検証は @Valid に任せる（タイトル/詳細の長さなどの手動チェックは削除） =====
+
+        // --- NGワード（業務ルール） ---
         List<String> forbiddenWords = Arrays.asList("願う", "想う", "考える", "祈る", "達成", "成功", "獲得");
         boolean forbidden = forbiddenWords.stream().anyMatch(word ->
             (task.getTitle() != null && task.getTitle().contains(word)) ||
@@ -120,14 +115,8 @@ public class TaskController {
         if (forbidden) {
             bindingResult.rejectValue("title", "forbidden", "もっと具体的に！");
         }
-        // 長さ
-        if (task.getTitle() != null && task.getTitle().length() > 10) {
-            bindingResult.rejectValue("title", "length", "タイトルは10文字以内にしてください。");
-        }
-        if (task.getDescription() != null && task.getDescription().length() > 20) {
-            bindingResult.rejectValue("description", "length", "詳細は20文字以内にしてください。");
-        }
-        // 重複（自分は除外）
+
+        // --- 重複（自分は除外） ---
         boolean exists = taskService.existsByTitleAndDescription(task.getTitle(), task.getDescription());
         Task existingTask = taskService.findById(task.getId());
         boolean isSameTask = existingTask != null
@@ -136,7 +125,8 @@ public class TaskController {
         if (exists && !isSameTask) {
             bindingResult.rejectValue("title", "duplicate", "タイトルと詳細が同じタスクが既に存在します。");
         }
-        // デフォルト進捗
+
+        // --- デフォルト進捗 ---
         if (task.getStatus() == null || task.getStatus().isBlank()) {
             task.setStatus("未着手");
         }
