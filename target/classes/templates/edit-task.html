@@ -19,20 +19,20 @@
     <input type="hidden" th:field="*{id}">
 
     <div style="margin-bottom: 8px;">
-      <label>タイトル：</label>
-      <input type="text" th:field="*{title}" required>
+      <label for="title">タイトル：</label>
+      <input id="title" type="text" th:field="*{title}" required maxlength="10" autocomplete="off">
       <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></span>
     </div>
 
     <div style="margin-bottom: 8px;">
-      <label>詳細：</label>
-      <input type="text" th:field="*{description}">
+      <label for="description">詳細：</label>
+      <input id="description" type="text" th:field="*{description}" maxlength="20">
       <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></span>
     </div>
 
     <div style="margin-bottom: 8px;">
-      <label>進捗：</label>
-      <select th:field="*{status}">
+      <label for="status">進捗：</label>
+      <select id="status" th:field="*{status}">
         <option value="未着手">未着手</option>
         <option value="着手中">着手中</option>
         <option value="完了">完了</option>
@@ -40,17 +40,17 @@
       <span th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="error"></span>
     </div>
 
-    <!-- ポイント：期限は disabled にしない。readonly は送信される -->
+    <!-- 期限：フロント側でも範囲を明示 -->
     <div style="margin-bottom: 8px;">
-      <label>期限：</label>
-      <input type="date" th:field="*{deadline}" id="deadlineInput">
+      <label for="deadlineInput">期限：</label>
+      <input type="date" th:field="*{deadline}" id="deadlineInput" min="1900-01-01" max="2100-12-31">
       <span th:if="${#fields.hasErrors('deadline')}" th:errors="*{deadline}" class="error"></span>
     </div>
 
     <button type="submit" class="button">確認へ</button>
   </form>
 
-  <!-- もし「完了のとき期限入力を触らせたくない」場合は readonly に切替（送信はされる） -->
+  <!-- 「完了」時は期限をreadonly（送信はされる） -->
   <script th:inline="javascript">
     /*<![CDATA[*/
     const statusSel = document.querySelector('select[name="status"]');
@@ -58,8 +58,7 @@
     const toggleDeadlineReadonly = () => {
       if (statusSel && deadlineInput) {
         const isDone = statusSel.value === '完了';
-        // disabled は送信されないので使わない
-        deadlineInput.readOnly = isDone; // ← これなら送信される
+        deadlineInput.readOnly = isDone; // disabled は送信されないので使わない
       }
     };
     if (statusSel) {
