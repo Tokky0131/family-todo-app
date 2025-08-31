@@ -16,37 +16,56 @@ import com.example.demo.repository.UserRepository;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // 🔧 追加：DIで注入
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public CustomUserDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder; // 🔧 追加：コンストラクタで受け取る
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository
-            .findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return new org.springframework.security.core.userdetails.User(
-            user.getUsername(),
-            user.getPassword(),
-            Collections.emptyList()
+                user.getUsername(),
+                user.getPassword(),
+                Collections.emptyList()
         );
     }
 
     // ✅ ユーザー名の重複チェック
     public boolean existsByUsername(String username) {
-        return userRepository.findByUsername(username).isPresent();
+        if (username == null) return false;
+        return userRepository.findByUsername(username.trim()).isPresent();
     }
 
-    // ✅ ユーザー登録（パスワード暗号化付き）
+    // ✅ ユーザー登録（バリデーション込み）
     public boolean registerUser(String username, String rawPassword) {
         try {
-            String encodedPassword = passwordEncoder.encode(rawPassword); // 🔧 修正：DIで使う
+            // --- 1. null / 空文字 / 空白のみチェック ---
+            if (username == null || rawPassword == null) return false;
+            username = username.trim();
+            rawPassword = rawPassword.trim();
+            if (username.isEmpty() || rawPassword.isEmpty()) return false;
 
+            // --- 2. 重複チェック ---
+            if (userRepository.findByUsername(username).isPresent()) {
+                return false;
+            }
+
+            // --- 3. パスワード最低限チェック ---
+            if (rawPassword.length() < 8) {
+                return false;
+            }
+
+            // --- 4. パスワードハッシュ化 ---
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+
+            // --- 5. 保存 ---
             User user = new User();
             user.setUsername(username);
             user.setPassword(encodedPassword);
@@ -54,7 +73,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             userRepository.save(user);
             return true;
         } catch (Exception e) {
-            e.printStackTrace(); // 任意でログ出力
+            e.printStackTrace(); // ログ出力
             return false;
         }
     }

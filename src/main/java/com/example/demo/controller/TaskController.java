@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.entity.Task;
@@ -46,23 +48,14 @@ public class TaskController {
         BindingResult bindingResult,
         Model model
     ) {
-        // 重複
+        // ===== 入力検証は @Valid（Task のアノテーション）に任せる =====
+
+        // --- 重複（業務ルール） ---
         if (taskService.existsByTitleAndDescription(task.getTitle(), task.getDescription())) {
             bindingResult.rejectValue("title", "duplicate", "タイトルと詳細が同じタスクが既に存在します。");
         }
-        // タイトル
-        if (task.getTitle() == null || task.getTitle().isBlank()) {
-            bindingResult.rejectValue("title", "blank", "タイトルは必須です。");
-        } else if (task.getTitle().length() > 10) {
-            bindingResult.rejectValue("title", "length", "タイトルは10文字以内で入力してください。");
-        }
-        // 詳細
-        if (task.getDescription() != null && !task.getDescription().isBlank()) {
-            if (task.getDescription().length() > 20) {
-                bindingResult.rejectValue("description", "length", "詳細は20文字以内で入力してください。");
-            }
-        }
-        // 禁止ワード
+
+        // --- 禁止ワード（業務ルール） ---
         List<String> forbiddenWords = List.of(
             "願う", "想う", "考える", "祈る",
             "優勝", "合格", "達成", "成功", "勝つ",
@@ -74,7 +67,8 @@ public class TaskController {
                 break;
             }
         }
-        // デフォルト進捗
+
+        // --- デフォルト進捗 ---
         if (task.getStatus() == null || task.getStatus().isBlank()) {
             task.setStatus("未着手");
         }
@@ -101,6 +95,9 @@ public class TaskController {
     @GetMapping("/tasks/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
         Task task = taskService.findById(id);
+        if (task == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
         model.addAttribute("task", task);
         return "edit-task";
     }
@@ -111,7 +108,9 @@ public class TaskController {
         BindingResult bindingResult,
         Model model
     ) {
-        // NGワード
+        // ===== 入力検証は @Valid に任せる =====
+
+        // --- NGワード（業務ルール） ---
         List<String> forbiddenWords = Arrays.asList("願う", "想う", "考える", "祈る", "達成", "成功", "獲得");
         boolean forbidden = forbiddenWords.stream().anyMatch(word ->
             (task.getTitle() != null && task.getTitle().contains(word)) ||
@@ -120,14 +119,8 @@ public class TaskController {
         if (forbidden) {
             bindingResult.rejectValue("title", "forbidden", "もっと具体的に！");
         }
-        // 長さ
-        if (task.getTitle() != null && task.getTitle().length() > 10) {
-            bindingResult.rejectValue("title", "length", "タイトルは10文字以内にしてください。");
-        }
-        if (task.getDescription() != null && task.getDescription().length() > 20) {
-            bindingResult.rejectValue("description", "length", "詳細は20文字以内にしてください。");
-        }
-        // 重複（自分は除外）
+
+        // --- 重複（自分は除外） ---
         boolean exists = taskService.existsByTitleAndDescription(task.getTitle(), task.getDescription());
         Task existingTask = taskService.findById(task.getId());
         boolean isSameTask = existingTask != null
@@ -136,7 +129,8 @@ public class TaskController {
         if (exists && !isSameTask) {
             bindingResult.rejectValue("title", "duplicate", "タイトルと詳細が同じタスクが既に存在します。");
         }
-        // デフォルト進捗
+
+        // --- デフォルト進捗 ---
         if (task.getStatus() == null || task.getStatus().isBlank()) {
             task.setStatus("未着手");
         }
@@ -154,8 +148,7 @@ public class TaskController {
     public String editComplete(@ModelAttribute Task form, RedirectAttributes redirectAttributes) {
         Task current = taskService.findById(form.getId());
         if (current == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "対象のタスクが見つかりませんでした。");
-            return "redirect:/tasks";
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
         }
         current.setTitle(form.getTitle());
         current.setDescription(form.getDescription());
@@ -172,6 +165,9 @@ public class TaskController {
     @GetMapping("/tasks/delete/confirm/{id}")
     public String deleteConfirm(@PathVariable Long id, Model model) {
         Task task = taskService.findById(id);
+        if (task == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
         model.addAttribute("task", task);
         return "confirm-delete-task";
     }
@@ -179,6 +175,9 @@ public class TaskController {
     @PostMapping("/tasks/delete/complete")
     public String deleteComplete(@ModelAttribute Task task, RedirectAttributes redirectAttributes) {
         Task taskToDelete = taskService.findById(task.getId());
+        if (taskToDelete == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
         String title = taskToDelete.getTitle();
         taskService.deleteById(task.getId());
         redirectAttributes.addFlashAttribute("successMessage", "\"" + title + "\" を削除しました！");

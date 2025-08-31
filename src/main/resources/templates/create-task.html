@@ -2,14 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>タスク作成</title>
+  <meta charset="UTF-8">
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-	<header>
+  <header>
     <div class="header-logo">
-    <img th:src="@{/images/my_todo_logo_final.png}" alt="MY TODO LOGO" style="height: 60px;">
-  </div>
+      <img th:src="@{/images/my_todo_logo_final.png}" alt="MY TODO LOGO" style="height: 60px;">
+    </div>
   </header>
+
   <h1 style="text-align:center;">タスク作成フォーム</h1>
 
   <div class="form-container">
@@ -20,10 +22,8 @@
       <div class="form-group">
         <label for="title">タイトル（10文字以内）</label>
         <div class="form-input">
-          <input type="text" id="title" th:field="*{title}" />
-          <div th:if="${#fields.hasErrors('title')}"
-               th:errors="*{title}"
-               class="flash-error"></div>
+          <input type="text" id="title" th:field="*{title}" required maxlength="10" autocomplete="off" />
+          <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="flash-error"></div>
         </div>
       </div>
 
@@ -31,10 +31,8 @@
       <div class="form-group">
         <label for="description">詳細（20文字以内）</label>
         <div class="form-input">
-          <textarea id="description" th:field="*{description}"></textarea>
-          <div th:if="${#fields.hasErrors('description')}"
-               th:errors="*{description}"
-               class="flash-error"></div>
+          <textarea id="description" th:field="*{description}" maxlength="20"></textarea>
+          <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="flash-error"></div>
         </div>
       </div>
 
@@ -42,10 +40,8 @@
       <div class="form-group">
         <label for="deadline">期限</label>
         <div class="form-input">
-          <input type="date" id="deadline" th:field="*{deadline}" />
-          <div th:if="${#fields.hasErrors('deadline')}"
-               th:errors="*{deadline}"
-               class="flash-error"></div>
+          <input type="date" id="deadline" th:field="*{deadline}" min="1900-01-01" max="2100-12-31" />
+          <div th:if="${#fields.hasErrors('deadline')}" th:errors="*{deadline}" class="flash-error"></div>
         </div>
       </div>
 
@@ -54,9 +50,9 @@
         <label for="status">進捗</label>
         <div class="form-input">
           <select id="status" th:field="*{status}">
-            <option value="未着手" th:selected="${task.status=='未着手'}">☓ 未着手</option>
-            <option value="着手中" th:selected="${task.status=='着手中'}">△ 着手中</option>
-            <option value="完了"   th:selected="${task.status=='完了'}">〇 完了</option>
+            <option value="未着手">☓ 未着手</option>
+            <option value="着手中">△ 着手中</option>
+            <option value="完了">〇 完了</option>
           </select>
         </div>
       </div>
@@ -68,7 +64,7 @@
     </form>
 
     <div class="form-actions">
-      <a th:href="@{/tasks}" >一覧に戻る</a>
+      <a th:href="@{/tasks}">一覧に戻る</a>
     </div>
   </div>
 </body>
